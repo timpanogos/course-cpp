@@ -21,10 +21,11 @@ public:
     void add(const Student* student);
     void remove(const string id);
     void printAll();
-    void printAverageDaysInCourse(const string id);
+    void printAverageDaysInCourse(const DegreeProgram degree);
     void printInvalidEmails();
     void printByDegreeProgram(const DegreeProgram degree);
     void printAStudent(Student* student);
+    static string degreeToString(DegreeProgram program);
     int getNumberOfStudents();
     const Student* getStudentByIndex(const unsigned short index);
 };

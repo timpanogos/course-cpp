@@ -24,12 +24,12 @@ Roster::Roster(unsigned short maximumSize)
 
 Roster::~Roster()
 {
-    for (int i = 0; i < length; i++) {
-        Student* student = classRosterArray[i];
-        classRosterArray[i] = NULL;
-        delete student;
-    }
-    delete[] classRosterArray;
+    //for (int i = 0; i < length; i++) {
+    //    Student* student = classRosterArray[i];
+    //    classRosterArray[i] = NULL;
+    //    delete student;
+    //}
+    //delete[] classRosterArray;
 }
 
 /* ****************************************************************************
@@ -84,8 +84,24 @@ void Roster::printAll() {
     cout << classRosterArray; 
 }
 
-void Roster::printAverageDaysInCourse(string id) {
-
+void Roster::printAverageDaysInCourse(DegreeProgram degree) {
+    int total = 0;
+    int count = 0;
+    Student* student;
+    for (int i = 0; i < length; i++) {
+        try {
+            student = classRosterArray[i];
+            DegreeProgram program = student->getDegree();
+            if (program == degree) {
+                ++count;
+                total += student->getDay(degree);
+            }
+        }
+        catch (string errMsg) {
+            Roster::printAStudent(student);
+        }
+    }
+    cout << "The average days in course: " << Roster::degreeToString(degree) << ": " << to_string(total ? (total / count) : 0) << endl;
 }
 
 void Roster::printInvalidEmails() {
@@ -103,17 +119,19 @@ void Roster::printInvalidEmails() {
 }
 
 void Roster::printByDegreeProgram(const DegreeProgram degree) {
-    //cout << "The following students are pursuing a " << degree << endl;
-    //Student* student;
-    //for (int i = 0; i < length; i++) {
-    //    try {
-    //        student = classRosterArray[i];
-    //        student->validateEmail(student->getEmail());
-    //    }
-    //    catch (string errMsg) {
-    //        Roster::printAStudent(student);
-    //    }
-    //}
+    cout << "The following students are pursuing a " << Roster::degreeToString(degree) << " degree" << endl;
+    Student* student;
+    for (int i = 0; i < length; i++) {
+        try {
+            student = classRosterArray[i];
+            DegreeProgram program = student->getDegree();
+            if (program == degree)
+                printAStudent(student);
+        }
+        catch (string errMsg) {
+            Roster::printAStudent(student);
+        }
+    }
 }
 
 void Roster::printAStudent(Student* student) {
@@ -145,8 +163,21 @@ void Roster::printAStudent(Student* student) {
 }
 
 /* ****************************************************************************
-* Development/Experimental functions
+* Helper and Development/Experimental functions
 * ****************************************************************************/
+
+ string Roster::degreeToString(DegreeProgram degree) {
+    switch (degree) {
+    case DegreeProgram::SECURITY:
+        return "Security";
+    case DegreeProgram::NETWORK:
+        return "Network";
+    case DegreeProgram::SOFTWARE:
+        return "Software";
+    default:
+        return "Unknown";
+    }
+}
 
 const Student* Roster::getStudentByIndex(const unsigned short index) {
     if (length == 0 || index < 0 || index > length - 1)

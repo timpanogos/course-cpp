@@ -191,19 +191,22 @@ int main()
         }
         else {
             roster->printInvalidEmails();
+
+            roster->printByDegreeProgram(DegreeProgram::SECURITY);
+            roster->printByDegreeProgram(DegreeProgram::NETWORK);
+            roster->printByDegreeProgram(DegreeProgram::SOFTWARE);
+
+            roster->printAverageDaysInCourse(DegreeProgram::SECURITY);
+            roster->printAverageDaysInCourse(DegreeProgram::NETWORK);
+            roster->printAverageDaysInCourse(DegreeProgram::SOFTWARE);
         }
-        delete roster;
     }
     catch (string errMsg) {
         cout << errMsg;
-        if (roster)
-            delete roster;
         return 1;
     }
     catch (...) {
         cout << "default exception caught";
-        if (roster)
-            delete roster;
         return 1;
     }
     return 0;
