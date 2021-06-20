@@ -7,24 +7,26 @@
 class Roster
 {
 private:
-    int maxSize;
-    int length;
+    unsigned short maxSize;
+    unsigned short length;
     Student** classRosterArray;
 
 public:
     Roster();
-    Roster(int maxSize);
+    Roster(const unsigned short maxSize);
     ~Roster(void);
-    Student* add(string id, string fname, string lname, string email, int age, int* days, DegreeProgram degree);
-    Student* add(Student* student);
-    void remove(string id);
+    void add(
+        const string id, const string fname, const string lname, const string email, 
+        const unsigned char age, const unsigned short* days, const DegreeProgram degree);
+    void add(const Student* student);
+    void remove(const string id);
     void printAll();
-    void printAverageDaysInCourse(string id);
+    void printAverageDaysInCourse(const string id);
     void printInvalidEmails();
-    void printByDegreeProgram(DegreeProgram degree);
+    void printByDegreeProgram(const DegreeProgram degree);
     void printAStudent(Student* student);
     int getNumberOfStudents();
-    Student* getStudentByIndex(int index);
+    const Student* getStudentByIndex(const unsigned short index);
 };
 
 #endif

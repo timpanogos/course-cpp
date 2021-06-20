@@ -15,7 +15,7 @@ Roster::Roster()
     classRosterArray = new Student * [maxSize];
 }
 
-Roster::Roster(int maximumSize)
+Roster::Roster(unsigned short maximumSize)
 {
     length = 0;
     maxSize = maximumSize;
@@ -36,22 +36,24 @@ Roster::~Roster()
 * Course functionality required functions
 * ****************************************************************************/
 
-Student* Roster::add(Student* student) {
+void Roster::add(const Student* student) {
     if (length == maxSize)
         throw(string("The student roster is full, size: " + maxSize));
-    classRosterArray[length++] = student;
-    return student;
+    Student* newStudent = new Student(student);
+    classRosterArray[length++] = newStudent;
 }
 
-Student* Roster::add(string id, string fname, string lname, string email, int age, int* days, DegreeProgram degree) {
+void Roster::add(
+    const string id, const string fname, const string lname, const string email, 
+    const unsigned char age, const unsigned short* days, const DegreeProgram degree) 
+{
     if (length == maxSize)
         throw(string("The student roster is full, size: " + maxSize));
     Student* student = new Student(id, fname, lname, email, age, days, degree);
     classRosterArray[length++] = student;
-    return student;
 }
 
-void Roster::remove(string studentId) {
+void Roster::remove(const string studentId) {
     int deleteIdx = -1;
     Student* student = NULL;
     for (int i = 0; i < length; i++) {
@@ -79,7 +81,7 @@ void Roster::remove(string studentId) {
 }
 
 void Roster::printAll() {
-
+    cout << classRosterArray; 
 }
 
 void Roster::printAverageDaysInCourse(string id) {
@@ -87,7 +89,7 @@ void Roster::printAverageDaysInCourse(string id) {
 }
 
 void Roster::printInvalidEmails() {
-    cout << "The following Students have an invalid email\n";
+    cout << "The following emails are invalid:\n";
     Student* student;
     for (int i = 0; i < length; i++) {
         try {
@@ -100,8 +102,18 @@ void Roster::printInvalidEmails() {
     }
 }
 
-void Roster::printByDegreeProgram(DegreeProgram degree) {
-
+void Roster::printByDegreeProgram(const DegreeProgram degree) {
+    //cout << "The following students are pursuing a " << degree << endl;
+    //Student* student;
+    //for (int i = 0; i < length; i++) {
+    //    try {
+    //        student = classRosterArray[i];
+    //        student->validateEmail(student->getEmail());
+    //    }
+    //    catch (string errMsg) {
+    //        Roster::printAStudent(student);
+    //    }
+    //}
 }
 
 void Roster::printAStudent(Student* student) {
@@ -113,10 +125,9 @@ void Roster::printAStudent(Student* student) {
         "Email: " + student->getEmail() + "\n" +
         "Age: " + to_string(student->getAge()) + "\n" +
         "Days Taken: [";
-        msg = msg + to_string(student->getDay(0)) + ", ";
-        msg = msg + to_string(student->getDay(1)) + ", ";
-        msg = msg + to_string(student->getDay(2)) + "]\n";
-
+        msg = msg + to_string(student->getDay(DegreeProgram::SECURITY)) + ", ";
+        msg = msg + to_string(student->getDay(DegreeProgram::NETWORK)) + ", ";
+        msg = msg + to_string(student->getDay(DegreeProgram::SOFTWARE)) + "]\n";
     string degree = "";
     switch (student->getDegree()) {
     case DegreeProgram::SECURITY:
@@ -137,7 +148,7 @@ void Roster::printAStudent(Student* student) {
 * Development/Experimental functions
 * ****************************************************************************/
 
-Student* Roster::getStudentByIndex(int index) {
+const Student* Roster::getStudentByIndex(const unsigned short index) {
     if (length == 0 || index < 0 || index > length - 1)
         throw(string("invalid index: " + index));
     return classRosterArray[index];

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "degree.h"
 #include "student.h"
 #include <new>
@@ -5,27 +6,28 @@
 /* ****************************************************************************
 * Constructors/Destructor
 * ****************************************************************************/
-Student::Student(Student* student){
+
+Student::Student(const Student* student){
     id = student->id;
     fname = student->fname;
     lname = student->lname;
     email = student->email;
     age = student->age;
-    daysTaken = new int[3];
+    days = new unsigned short[3];
     for (int i = 0; i < 3; i++) {
-        daysTaken[i] = student->daysTaken[i];
+        days[i] = student->days[i];
     }
     degree = student->degree;
 };
 
 Student::Student(
-    string studentId,
-    string firstName,
-    string lastName,
-    string studentEmail,
-    int studentAge,
-    int* takenDays,
-    DegreeProgram degreeProgram)
+    const string studentId,
+    const string firstName,
+    const string lastName,
+    const string studentEmail,
+    const unsigned char studentAge,
+    const unsigned short* daysTaken,
+    const DegreeProgram degreeProgram)
 {
     if (studentId.length() < 2)
         throw(string("student id must be at least 2 characters: " + studentId));
@@ -33,51 +35,52 @@ Student::Student(
         throw(string("first name must be at least 2 characters: " + firstName));
     if (lastName.length() < 2)
         throw(string("last name must be at least 2 characters: " + lastName));
-    if(developmentMode)
+    if(DEVELOPMENT_MODE)
         validateEmail(studentEmail); // the required functionality needs to allow invalid emails to be entered ... see Roster::printInvalidEmails();
     if (studentAge < 5 || studentAge > 100)
         throw(string("student age must be more than 4 and less than or equal to 100: " + studentAge));
-    validateDays(takenDays);
+    validateDays(daysTaken);
 
     id = studentId;
     fname = firstName;
     lname = lastName;
     email = studentEmail;
     age = studentAge;
-    daysTaken = new int[3];
+    days = new unsigned short[3];
     for (int i = 0; i < 3; i++) {
-        daysTaken[i] = takenDays[i];
+        days[i] = daysTaken[i];
     }
     degree = degreeProgram;
 }
 
 Student::~Student()
 {
-    delete[] daysTaken;
+    delete[] days;
 }
 
 /* ****************************************************************************
 * Validator functions
 * ****************************************************************************/
 
-void Student::validateDays(int* days) {
+void Student::validateDays(const unsigned short* daysTaken) {
     try {
-        for(int i = 0; i < 3; i++) {
-            int day = days[i];
-            if(day < 1 || day > 90)
+        for(int i = 0; i < NUMBER_OF_PROGRAMS; i++) {
+            int day = daysTaken[i];
+            if(day < 0 || day > MAXDAYS)
                 throw(day);
         }
     }
     catch (...) {
-        throw(string("takenDays must be an int array of length 3 where each day is more than 0 and less than or equal to 90"));
+        throw(string("daysTaken must be a unsigned short array of length: " + to_string(NUMBER_OF_PROGRAMS) + " where each day is more than 0 and less than or equal to " + to_string(MAXDAYS)));
     }
 }
 
-void Student::validateEmail(string email) {
+void Student::validateEmail(const string email) {
     if (email.length() < 5)
         throw(string("student email must be at least 5 characters: " + email)); // a@b.c min
     string attaboy = string("@");
     string period = string(".");
+    string space = string(" ");
     size_t attaboyIdx = email.find(attaboy);
     if (attaboyIdx == string::npos)
         throw(string("student email must contain a @: " + email));
@@ -87,29 +90,41 @@ void Student::validateEmail(string email) {
     attaboyIdx = email.find(attaboy, ++attaboyIdx);
     if (attaboyIdx != string::npos)
         throw(string("student email must contain only 1 @: " + email));
+    size_t spaceIdx = email.find(space); 
+    if (spaceIdx != string::npos)
+        throw(string("student email must not contain a space: " + email));
 }
 
 /* ****************************************************************************
 * Getters
 * ****************************************************************************/
 
-string Student::getId() { 
-    return id; 
+const string Student::getId() { return id; }
+const string Student::getFirstName() { return fname; }
+const string Student::getLastName() { return lname; }
+const string Student::getEmail() { return email; }
+unsigned char Student::getAge() { return age; }
+const unsigned short* Student::getDays() {
+    return days; 
 }
-string Student::getFirstName() { return fname; }
-string Student::getLastName() { return lname; }
-string Student::getEmail() { return email; }
-int Student::getAge() { return age; }
-int* Student::getDays() { 
-    return daysTaken; 
+unsigned short Student::getDay(DegreeProgram degree) {
+    int index;
+    switch (degree) {
+        case DegreeProgram::SECURITY:
+            index = 0;
+            break;
+        case DegreeProgram::NETWORK:
+            index = 1;
+            break;
+        case DegreeProgram::SOFTWARE:
+            index = 2;
+            break;
+        default:
+            throw(string("unknown degree"));
+    }
+    return days[index];
 }
-int Student::getDay(int index) { 
-    if (index < 0 || index > 2)
-        throw(string("index must be >= 0 and < 3 index: " + index));
-    int day = *(daysTaken + index); 
-    return day;
-}
-DegreeProgram Student::getDegree() { return degree; }
+const DegreeProgram Student::getDegree() { return degree; }
 
 /* ****************************************************************************
 * Setters
@@ -138,16 +153,19 @@ void Student::setEmail(string value) {
     email = value;
 }
 
-void Student::setAge(int value) {
+void Student::setAge(const unsigned char value) {
     if (value < 5 || value > 100)
         throw(string("student age must be more than 4 and less than or equal to 100: " + value));
     age = value;
 }
 
-void Student::setDays(int* value) {
+void Student::setDays(const unsigned short* value) {
     validateDays(value);
-    daysTaken = value;
+    days = new unsigned short[NUMBER_OF_PROGRAMS];
+    for (int i = 0; i < 3; i++)
+        days[i] = value[i];
 }
 
-void Student::setDegree(DegreeProgram value) { degree = value; }
+void Student::setDegree(const DegreeProgram value) { degree = value; }
+
 
