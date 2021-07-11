@@ -199,6 +199,8 @@ int main()
             roster->printAverageDaysInCourse(DegreeProgram::SECURITY);
             roster->printAverageDaysInCourse(DegreeProgram::NETWORK);
             roster->printAverageDaysInCourse(DegreeProgram::SOFTWARE);
+
+            roster->printAll();
         }
     }
     catch (string errMsg) {
